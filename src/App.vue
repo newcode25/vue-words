@@ -9,12 +9,21 @@
     <p>Lista de Palavras:</p>
 
     <ul v-if="!!words && words.length > 0">
-      <li v-for="(word, index) of words" :key="word + index">
-        <button @click="removeWord(word)" class="waves-effect waves-light btn-small red">x</button>
+      <li v-for="(word, index) of words" :key="word + index" class="divWords">
+        <button
+          @click="removeWord(word, totalVogais[index])"
+          class="waves-effect waves-light btn-small red"
+        >
+          x
+        </button>
         &nbsp;&nbsp;&nbsp;
-        <span> {{ word }} </span>
-        &nbsp;&nbsp;&nbsp;
-        <span>Total de Vogais: {{ totalVogais[index] }}</span>
+        <span>{{ word }}</span>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+        <span>
+          <div>Total de Vogais: {{ totalVogais[index] }}</div>
+          <div>Total de Consoantes: {{ totalConsoantes[index] }}</div>
+          <div>Total de Letras: {{ totalVogais[index] + totalConsoantes[index] }}</div>
+        </span>
       </li>
     </ul>
     <p v-else>Nenhuma palavra cadastrada.</p>
@@ -29,6 +38,7 @@ export default {
     return {
       words: [],
       totalVogais: [],
+      totalConsoantes: [],
     };
   },
 
@@ -43,28 +53,19 @@ export default {
       for (i = 0; i < word.length; i++) {
         if (vogais.indexOf(word[i]) != -1) {
           totalVogal++;
-          // console.log(totalVogal);
         }
       }
 
-      this.totalVogais.push(totalVogal);
+      const totalConsoante = word.length - totalVogal;
 
-      /**
-       * Verificamos se realmente podemos incluir a
-       * nova tarefa
-       */
+      this.totalVogais.push(totalVogal);
+      this.totalConsoantes.push(totalConsoante);
+
       if (!this._canAddWord(word)) return;
 
       this.words.push(word);
     },
 
-    /**
-     * Verifica a possibilidade da inclusão da palavra
-     * com base nas seguintes regras:
-     *
-     * 1) Palavra existente
-     * 2) Descrição ainda não existe na listagem de palavras
-     */
     _canAddWord: function (word) {
       return !!word && this.words.filter(word => word.description === word).length === 0;
     },
@@ -72,8 +73,10 @@ export default {
     /**
      * Excluindo a palavra
      */
-    removeWord(word) {
+    removeWord(word, vogal) {
       this.words.splice(this.words.indexOf(word), 1);
+      this.totalVogais.splice(this.totalVogais.indexOf(vogal), 1);
+      this.totalConsoantes.splice(this.totalConsoantes.indexOf(vogal), 1);
     },
   },
 };
@@ -82,10 +85,13 @@ export default {
 <style>
 body {
   padding: 20px;
+  background: rgb(240, 243, 240);
 }
 
-.completed {
-  color: green;
-  font-weight: bold;
+.divWords {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  border: solid rgb(228, 220, 211) 1px;
 }
 </style>
